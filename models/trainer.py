@@ -91,6 +91,7 @@ class Trainer:
             bar.update(1)
             bar.set_postfix_str(f'Loss: {loss:.6f}')
         self.write_losses(epoch, writer, tracker, mode='train')
+        bar.close()
 
     def valid_step(self, epoch, model, loader, writer):
         model.eval()

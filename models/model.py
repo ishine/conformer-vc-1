@@ -93,4 +93,3 @@ class ConformerVC(nn.Module):
         x = x + self.post_net(x)
         x *= y_mask
         return x
-
