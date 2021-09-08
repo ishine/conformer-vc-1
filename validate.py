@@ -28,8 +28,10 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    checkpoint = torch.load(f'{args.model_dir}/latest.ckpt')
     model = ConformerVC(config.model)
-    model.load_state_dict(torch.load(f'{args.model_dir}/latest.ckpt')['model'])
+    model.load_state_dict(checkpoint['model'])
+    print(f'Loaded Model Iteration {checkpoint["iteration"]} step')
     hifi_gan = load_hifi_gan(args.hifi_gan)
     model, hifi_gan = model.eval().to(device), hifi_gan.eval().to(device)
 
