@@ -60,7 +60,7 @@ def main():
         plt.imshow(mel, aspect='auto', origin='lower')
         plt.savefig(path)
 
-    fns = list(sorted(list(Path(args.data_dir).glob('*.pt'))))[500:]
+    fns = list(sorted(list(Path(args.data_dir).glob('*.pt'))))
 
     for fn in tqdm(fns, total=len(fns)):
         (
