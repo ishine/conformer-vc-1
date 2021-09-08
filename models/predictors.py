@@ -41,10 +41,7 @@ class VarianceAdopter(nn.Module):
         tgt_energy,
         path
     ):
-        dur_pred = self.duration_predictor(x, x_mask)
-
-        # if path is None:
-        #     path = torch.ceil(torch.exp(dur_pred))
+        dur_pred = self.duration_predictor(x.detach(), x_mask)
 
         x = self.length_regulator(x, path)
 
@@ -107,13 +104,5 @@ class VariancePredictor(nn.Module):
 
 class LengthRegulator(nn.Module):
     def forward(self, x, path):
-        x = torch.einsum('b c t, b t d -> b c d', x, path)
-        return x
-
-    def predict(self, x, duration, x_length, y_length):
-        x_mask = sequence_mask(x_length).to(x.dtype)
-        z_mask = sequence_mask(y_length).to(x.dtype)
-        attn_mask = torch.unsqueeze(x_mask, -1) * torch.unsqueeze(z_mask, -2)
-        path = generate_path(duration, attn_mask)
         x = torch.einsum('b c t, b t d -> b c d', x, path)
         return x

@@ -2,7 +2,6 @@ import torch.nn as nn
 
 from .attention import LayerNorm, MultiHeadAttention
 from .common import GLU
-from .utils import sequence_mask
 
 
 class ConformerLayer(nn.Module):
@@ -60,7 +59,7 @@ class ConformerLayer(nn.Module):
 
         x += self.conv_module(x)
         x += 0.5 * self.ff2(x)
-        x = self.dropout(x)
+        x = self.norm_post(x)
         x *= x_mask
         return x
 
