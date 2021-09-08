@@ -1,0 +1,29 @@
+seed: 42
+model_dir: ../../models/cfm_vc
+resume_checkpoint: false
+
+train:
+  fp16: true
+  batch_size: 16
+  num_epochs: 1000
+  log_interval: 1
+
+data:
+  data_dir: ./DATA
+
+model:
+  encoder:
+    channels: 384
+    n_heads: 2
+    n_layers: 4
+    dropout: 0.1
+
+  decoder:
+    channels: 384
+    n_heads: 2
+    n_layers: 4
+    dropout: 0.1
+
+optimizer:
+  lr: 0.001
+  betas: [0.8, 0.99]

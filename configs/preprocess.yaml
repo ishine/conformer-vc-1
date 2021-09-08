@@ -1,0 +1,4 @@
+jmvd_dir: ../../dataset/vc/jmvd/basic5000
+jsut_dir: ../../dataset/jsut/wav
+label_dir: ../../dataset/jsut/labels
+output_dir: ./dataset/feats
