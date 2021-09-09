@@ -77,6 +77,7 @@ class Trainer:
                         optimizer
                     )
             scheduler.step()
+        writer.close()
 
     def train_step(self, epoch, model, optimizer, loader, writer, accelerator):
         model.train()

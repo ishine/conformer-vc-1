@@ -1,11 +1,11 @@
 seed: 42
-model_dir: ../../models/cfm_vc
+model_dir: ../../models/test
 resume_checkpoint: false
 
 train:
   fp16: true
   batch_size: 32
-  num_epochs: 1500
+  num_epochs: 3000
   log_interval: 100
 
 data:
