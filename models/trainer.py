@@ -90,6 +90,7 @@ class Trainer:
             optimizer.step()
             bar.update(1)
             bar.set_postfix_str(f'Loss: {loss:.6f}')
+        bar.set_postfix_str(f'Mean Loss: {tracker.loss.mean():.6f}')
         self.write_losses(epoch, writer, tracker, mode='train')
         bar.close()
 
@@ -161,6 +162,6 @@ class Trainer:
             'optimizer': optimizer.state_dict()
         }, save_path)
 
-    def write_losses(self, epoch, writer, loss_dict, mode='train'):
-        for k, v in loss_dict.items():
+    def write_losses(self, epoch, writer, tracker, mode='train'):
+        for k, v in tracker.items():
             writer.add_scalar(f'{mode}/{k}', v.mean(), epoch)
