@@ -12,6 +12,7 @@ The differences between original paper are
 # Usage
 
 1. Preprocess
+
 Note that this projects is for my dataset.  
 So, if you wanna train your dataset, please rewrite configs/preprocess.yaml and preprocess.py properly.
 
