@@ -55,9 +55,22 @@ def main():
             bits_per_sample=16
         )
 
-    def save_mel(mel, path):
-        plt.figure(figsize=(10, 7))
-        plt.imshow(mel, aspect='auto', origin='lower')
+    def save_mel_three_attn(src, tgt, gen, attn, path):
+        plt.figure(figsize=(20, 7))
+        plt.subplot(321)
+        plt.gca().title.set_text('MSK')
+        plt.imshow(src, aspect='auto', origin='lower')
+        plt.subplot(323)
+        plt.gca().title.set_text('JSUT')
+        plt.imshow(tgt, aspect='auto', origin='lower')
+        plt.subplot(325)
+        plt.gca().title.set_text('GEN')
+        plt.imshow(gen, aspect='auto', origin='lower')
+        plt.subplot(122)
+        plt.gca().title.set_text('alignment')
+        plt.xlabel('MSK')
+        plt.ylabel('JSUT')
+        plt.imshow(attn.T, aspect='auto', origin='lower')
         plt.savefig(path)
 
     fns = list(sorted(list(Path(args.data_dir).glob('*.pt'))))
@@ -77,7 +90,6 @@ def main():
             path
         ) = torch.load(fn)
         mel_gen, wav_gen = infer(src_mel, src_length, src_pitch, src_energy)
-        tgt_wav = hifi_gan(tgt_mel.transpose(-1, -2).unsqueeze(0).to(device)).squeeze(0).cpu()
 
         d = output_dir / os.path.splitext(fn.name)[0]
         d.mkdir(exist_ok=True)
@@ -86,9 +98,15 @@ def main():
         save_wav(tgt_wav, d / 'tgt.wav')
         save_wav(wav_gen, d / 'gen.wav')
 
-        save_mel(src_mel.transpose(-1, -2).squeeze(), d / 'src.png')
-        save_mel(tgt_mel.transpose(-1, -2).squeeze(), d / 'tgt.png')
-        save_mel(mel_gen.squeeze(), d / 'gen.png')
+        src_mel_stretch = torch.einsum('t c, t d -> d c', src_mel, path)
+
+        save_mel_three_attn(
+            src_mel_stretch.squeeze().transpose(0, 1),
+            tgt_mel.squeeze().transpose(0, 1),
+            mel_gen.squeeze(),
+            path,
+            d / 'comp.png'
+        )
 
 
 if __name__ == '__main__':
