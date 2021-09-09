@@ -56,7 +56,7 @@ class Trainer:
         model = ConformerVC(config.model)
         optimizer = optim.AdamW(model.parameters(), eps=1e-9, **config.optimizer)
 
-        epochs = self.load(config, model, optimizer)
+        epochs = self.load(config, model, optimizer) + 1
 
         model, optimizer, train_loader, valid_loader = accelerator.prepare(
             model, optimizer, train_loader, valid_loader
