@@ -88,8 +88,11 @@ class PreProcessor:
             pitch = np.array(pitch).astype(np.float32)
             energy = np.array(energy).astype(np.float32)
 
-            pitch_scaler.partial_fit(pitch[pitch != 0].reshape(-1, 1))
-            energy_scaler.partial_fit(energy[energy != 0].reshape(-1, 1))
+            pitch[pitch != 0] = np.log(pitch[pitch != 0])
+            energy[energy != 0] = np.log(energy[energy != 0])
+
+            # pitch_scaler.partial_fit(pitch[pitch != 0].reshape(-1, 1))
+            # energy_scaler.partial_fit(energy[energy != 0].reshape(-1, 1))
 
             assert pitch.shape[0] == mel.size(-1)
 
@@ -100,8 +103,8 @@ class PreProcessor:
             energies.append(energy)
             mfccs.append(mfcc)
 
-        pitches = self.normalize(pitches, pitch_scaler)
-        energies = self.normalize(energies, energy_scaler)
+        # pitches = self.normalize(pitches, pitch_scaler)
+        # energies = self.normalize(energies, energy_scaler)
 
         return wavs, mels, pitches, energies, mfccs, lengths
 
@@ -127,8 +130,11 @@ class PreProcessor:
             pitch = np.array(pitch).astype(np.float32)
             energy = np.array(energy).astype(np.float32)
 
-            pitch_scaler.partial_fit(pitch[pitch != 0].reshape(-1, 1))
-            energy_scaler.partial_fit(energy[energy != 0].reshape(-1, 1))
+            pitch[pitch != 0] = np.log(pitch[pitch != 0])
+            energy[energy != 0] = np.log(energy[energy != 0])
+
+            # pitch_scaler.partial_fit(pitch[pitch != 0].reshape(-1, 1))
+            # energy_scaler.partial_fit(energy[energy != 0].reshape(-1, 1))
 
             assert pitch.shape[0] == mel.size(-1)
 
@@ -139,8 +145,8 @@ class PreProcessor:
             energies.append(energy)
             mfccs.append(mfcc)
 
-        pitches = self.normalize(pitches, pitch_scaler)
-        energies = self.normalize(energies, energy_scaler)
+        # pitches = self.normalize(pitches, pitch_scaler)
+        # energies = self.normalize(energies, energy_scaler)
 
         return wavs, mels, pitches, energies, mfccs, lengths
 

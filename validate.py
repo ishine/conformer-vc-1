@@ -50,7 +50,7 @@ def main():
         torchaudio.save(
             str(path),
             wav,
-            SR,
+            24000,
             encoding='PCM_S',
             bits_per_sample=16
         )
@@ -77,6 +77,7 @@ def main():
             path
         ) = torch.load(fn)
         mel_gen, wav_gen = infer(src_mel, src_length, src_pitch, src_energy)
+        tgt_wav = hifi_gan(tgt_mel.transpose(-1, -2).unsqueeze(0).to(device)).squeeze(0).cpu()
 
         d = output_dir / os.path.splitext(fn.name)[0]
         d.mkdir(exist_ok=True)
