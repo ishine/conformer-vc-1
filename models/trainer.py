@@ -149,7 +149,7 @@ class Trainer:
         if config.resume_checkpoint:
             checkpoint = torch.load(f'{config.model_dir}/latest.ckpt')
             epochs = checkpoint['epoch']
-            iteration = checkpoint['itereation']
+            iteration = checkpoint['iteration']
             model.load_state_dict(checkpoint['model'])
             optimizer.load_state_dict(checkpoint['optimizer'])
             print(f'Loaded {iteration}iter model and optimizer.')
