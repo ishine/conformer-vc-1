@@ -1,6 +1,6 @@
 seed: 42
 model_dir: ../../models/test
-resume_checkpoint: false
+resume_checkpoint: true
 
 train:
   fp16: true
