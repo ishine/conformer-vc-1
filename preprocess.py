@@ -8,7 +8,6 @@ import torch
 from omegaconf import OmegaConf
 from resemblyzer import trim_long_silences
 from tqdm import tqdm
-from sklearn.preprocessing import StandardScaler
 
 from transform import TacotronSTFT
 from dtw import dtw
@@ -70,9 +69,6 @@ class PreProcessor:
     def process_jmvd(self):
         jmvd_paths = list(sorted(list(self.jmvd_dir.glob('*.wav'))))
 
-        pitch_scaler = StandardScaler()
-        energy_scaler = StandardScaler()
-
         wavs = list()
         mels = list()
         lengths = list()
@@ -91,9 +87,6 @@ class PreProcessor:
             pitch[pitch != 0] = np.log(pitch[pitch != 0])
             energy[energy != 0] = np.log(energy[energy != 0])
 
-            # pitch_scaler.partial_fit(pitch[pitch != 0].reshape(-1, 1))
-            # energy_scaler.partial_fit(energy[energy != 0].reshape(-1, 1))
-
             assert pitch.shape[0] == mel.size(-1)
 
             wavs.append(jmvd_wav)
@@ -103,17 +96,12 @@ class PreProcessor:
             energies.append(energy)
             mfccs.append(mfcc)
 
-        # pitches = self.normalize(pitches, pitch_scaler)
-        # energies = self.normalize(energies, energy_scaler)
-
         return wavs, mels, pitches, energies, mfccs, lengths
 
     def process_jsut(self):
         jsut_paths = list(sorted(list(self.jsut_dir.glob('*.wav'))))[:550]
         label_paths = list(sorted(list(self.label_dir.glob('*.lab'))))[:len(jsut_paths)]
 
-        pitch_scaler = StandardScaler()
-        energy_scaler = StandardScaler()
 
         wavs = list()
         mels = list()
@@ -133,9 +121,6 @@ class PreProcessor:
             pitch[pitch != 0] = np.log(pitch[pitch != 0])
             energy[energy != 0] = np.log(energy[energy != 0])
 
-            # pitch_scaler.partial_fit(pitch[pitch != 0].reshape(-1, 1))
-            # energy_scaler.partial_fit(energy[energy != 0].reshape(-1, 1))
-
             assert pitch.shape[0] == mel.size(-1)
 
             wavs.append(jsut_wav)
@@ -144,9 +129,6 @@ class PreProcessor:
             pitches.append(pitch)
             energies.append(energy)
             mfccs.append(mfcc)
-
-        # pitches = self.normalize(pitches, pitch_scaler)
-        # energies = self.normalize(energies, energy_scaler)
 
         return wavs, mels, pitches, energies, mfccs, lengths
 
