@@ -61,7 +61,7 @@ class Trainer:
         model, optimizer, train_loader, valid_loader = accelerator.prepare(
             model, optimizer, train_loader, valid_loader
         )
-        scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.99985, last_epoch=epochs-1)
+        scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.99985, last_epoch=epochs-2)
 
         for epoch in range(epochs, config.train.num_epochs):
             self.train_step(epoch, model, optimizer, train_loader, writer, accelerator)
