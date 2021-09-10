@@ -47,11 +47,11 @@ class VarianceAdopter(nn.Module):
 
         pitch = self.pitch_conv(pitch)
         pitch = self.length_regulator(pitch, path)
+        pitch = self.pitch_predictor(x.detach() + pitch, y_mask)
+
         energy = self.energy_conv(energy)
         energy = self.length_regulator(energy, path)
-
-        pitch = self.pitch_predictor(pitch, y_mask)
-        energy = self.energy_predictor(energy, y_mask)
+        energy = self.energy_predictor(x + energy, y_mask)
 
         x += tgt_pitch + tgt_energy
         return x, (dur_pred, pitch, energy)
@@ -69,11 +69,11 @@ class VarianceAdopter(nn.Module):
 
         pitch = self.pitch_conv(pitch)
         pitch = self.length_regulator(pitch, path)
-        pitch = self.pitch_predictor(pitch, y_mask)
+        pitch = self.pitch_predictor(x + pitch, y_mask)
 
         energy = self.energy_conv(energy)
         energy = self.length_regulator(energy, path)
-        energy = self.energy_predictor(energy, y_mask)
+        energy = self.energy_predictor(x + energy, y_mask)
 
         x += pitch + energy
         return x, y_mask
