@@ -56,12 +56,12 @@ class Trainer:
         model = ConformerVC(config.model)
         optimizer = optim.AdamW(model.parameters(), eps=1e-9, **config.optimizer)
 
-        epochs = self.load(config, model, optimizer) + 1
+        epochs = self.load(config, model, optimizer)
 
         model, optimizer, train_loader, valid_loader = accelerator.prepare(
             model, optimizer, train_loader, valid_loader
         )
-        scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.99985, last_epoch=epochs-2)
+        scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.99985, last_epoch=epochs-1)
 
         for epoch in range(epochs, config.train.num_epochs):
             self.train_step(epoch, model, optimizer, train_loader, writer, accelerator)
@@ -153,7 +153,7 @@ class Trainer:
             model.load_state_dict(checkpoint['model'])
             optimizer.load_state_dict(checkpoint['optimizer'])
             print(f'Loaded {iteration}iter model and optimizer.')
-            return epochs
+            return epochs + 1
         else:
             return 0
 
