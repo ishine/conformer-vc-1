@@ -45,7 +45,7 @@ class VarianceAdopter(nn.Module):
 
         x = self.length_regulator(x, path)
 
-        pitch = self.pitch_conv(pitch.detach())
+        pitch = self.pitch_conv(pitch)
         pitch = self.length_regulator(pitch, path)
         energy = self.energy_conv(energy)
         energy = self.length_regulator(energy, path)
