@@ -68,7 +68,7 @@ class Trainer:
             accelerator.wait_for_everyone()
             if accelerator.is_main_process:
                 self.valid_step(epoch, model, valid_loader, writer)
-                if (epoch + 1) % config.train.log_interval == 0:
+                if (epoch + 1) % config.train.save_interval == 0:
                     self.save(
                         output_dir / 'latest.ckpt',
                         epoch,
