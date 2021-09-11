@@ -23,12 +23,7 @@ class RelativeSelfAttentionLayer(nn.Module):
 
 class RelativeMultiHeadAttention(nn.Module):
 
-    def __init__(
-        self,
-        channels: int = 512,
-        num_heads: int = 2,
-        dropout: float = 0.1,
-    ):
+    def __init__(self, channels, num_heads, dropout):
         super(RelativeMultiHeadAttention, self).__init__()
         assert channels % num_heads == 0, "d_model % num_heads should be zero."
         self.channels = channels
@@ -49,14 +44,7 @@ class RelativeMultiHeadAttention(nn.Module):
 
         self.out_proj = nn.Conv1d(channels, channels, 1)
 
-    def forward(
-        self,
-        query,
-        key,
-        value,
-        pos_embedding,
-        mask=None
-    ):
+    def forward(self, query, key, value, pos_embedding, mask=None):
         B = value.size(0)
 
         query = self.query_proj(query).view(B, self.num_heads, self.inner_channels, -1)
