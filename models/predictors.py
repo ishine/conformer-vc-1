@@ -41,7 +41,7 @@ class VarianceAdopter(nn.Module):
         tgt_energy,
         path
     ):
-        dur_pred = torch.relu(self.duration_predictor(x.detach(), x_mask))
+        dur_pred = torch.relu(self.duration_predictor(x, x_mask))
 
         x = self.length_regulator(x, path)
 
@@ -51,7 +51,7 @@ class VarianceAdopter(nn.Module):
 
         energy = self.energy_conv(energy)
         energy = self.length_regulator(energy, path)
-        energy = self.energy_predictor(x.detach() + energy, y_mask)
+        energy = self.energy_predictor(x + energy, y_mask)
 
         x += tgt_pitch + tgt_energy
         return x, (dur_pred, pitch, energy)
