@@ -87,7 +87,7 @@ class RelPositionalEncoding(nn.Module):
 
     def extend_pe(self, x):
         if self.pe is not None:
-            if self.pe.size(1) >= x.size(1) * 2 - 1:
+            if self.pe.size(2) >= x.size(1) * 2 - 1:
                 if self.pe.dtype != x.dtype or self.pe.device != x.device:
                     self.pe = self.pe.to(dtype=x.dtype, device=x.device)
                 return
