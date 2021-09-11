@@ -12,6 +12,7 @@ from torch.utils.data import DataLoader
 
 from data import VCDataset, collate_fn
 from .model import ConformerVC
+from .lr_scheduler import NoamLR
 from utils import seed_everything, Tracker
 
 
@@ -61,7 +62,7 @@ class Trainer:
         model, optimizer, train_loader, valid_loader = accelerator.prepare(
             model, optimizer, train_loader, valid_loader
         )
-        scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.99985, last_epoch=epochs-1)
+        scheduler = NoamLR(optimizer, warmup_steps=4000, d_model=config.model.encoder.channels)
 
         for epoch in range(epochs, config.train.num_epochs):
             self.train_step(epoch, model, optimizer, train_loader, writer, accelerator)
