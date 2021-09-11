@@ -57,7 +57,7 @@ class VarianceAdopter(nn.Module):
         return x, (dur_pred, pitch, energy)
 
     def infer(self, x, x_mask, pitch, energy):
-        dur_pred = self.duration_predictor(x, x_mask)
+        dur_pred = torch.relu(self.duration_predictor(x, x_mask))
         dur_pred = torch.round(dur_pred) * x_mask
         y_lengths = torch.clamp_min(torch.sum(dur_pred, [1, 2]), 1).long()
         y_mask = sequence_mask(y_lengths).unsqueeze(1).to(x_mask.device)
