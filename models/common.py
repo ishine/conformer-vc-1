@@ -106,7 +106,7 @@ class RelPositionalEncoding(nn.Module):
         pe_positive = torch.flip(pe_positive, [0]).unsqueeze(0)
         pe_negative = pe_negative[1:].unsqueeze(0)
         pe = torch.cat([pe_positive, pe_negative], dim=1)
-        self.pe = pe.transpose(-1, -2).to(device=x.device, dtype=x.dtype)
+        self.pe = pe.transpose(-1, -2).to(device=x.device, dtype=x.dtype).half()
 
     def forward(self, x):
         self.extend_pe(x)
