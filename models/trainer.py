@@ -142,7 +142,7 @@ class Trainer:
         assert data_dir.exists()
 
         fns = list(sorted(list(data_dir.glob('*.pt'))))
-        train_size = int(len(fns) * config.train.train_ratio)
+        train_size = 500
         train = fns[:train_size]
         valid = fns[train_size:]
         return train, valid
