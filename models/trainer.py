@@ -62,10 +62,10 @@ class Trainer:
         model, optimizer, train_loader, valid_loader = accelerator.prepare(
             model, optimizer, train_loader, valid_loader
         )
-        scheduler = NoamLR(optimizer, warmup_steps=4000, d_model=config.model.encoder.channels, last_epoch=epochs-1)
+        scheduler = NoamLR(optimizer, d_model=config.model.encoder.channels, last_epoch=epochs * len(train_loader) - 1)
 
         for epoch in range(epochs, config.train.num_epochs):
-            self.train_step(epoch, model, optimizer, train_loader, writer, accelerator)
+            self.train_step(epoch, model, optimizer, scheduler, train_loader, writer, accelerator)
             accelerator.wait_for_everyone()
             if accelerator.is_main_process:
                 self.valid_step(epoch, model, valid_loader, writer)
@@ -80,7 +80,7 @@ class Trainer:
             scheduler.step()
         writer.close()
 
-    def train_step(self, epoch, model, optimizer, loader, writer, accelerator):
+    def train_step(self, epoch, model, optimizer, scheduler, loader, writer, accelerator):
         model.train()
         tracker = Tracker()
         bar = tqdm(desc=f'Epoch: {epoch + 1}', total=len(loader), disable=not accelerator.is_main_process)
@@ -90,6 +90,7 @@ class Trainer:
             accelerator.backward(loss)
             accelerator.clip_grad_norm_(model.parameters(), 5)
             optimizer.step()
+            scheduler.step()
             bar.update()
             bar.set_postfix_str(f'Loss: {loss:.6f}')
         bar.set_postfix_str(f'Mean Loss: {tracker.loss.mean():.6f}')
