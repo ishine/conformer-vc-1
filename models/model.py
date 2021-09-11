@@ -1,6 +1,6 @@
 import torch.nn as nn
 
-from .common import RelPositionalEncoding
+from .common import RelPositionalEncoding, PostNet
 from .conformer import Conformer
 from .predictors import VarianceAdopter
 from .utils import sequence_mask
@@ -21,28 +21,8 @@ class ConformerVC(nn.Module):
             dropout=params.encoder.dropout
         )
         self.decoder = Conformer(**params.decoder)
-
         self.out_conv = nn.Conv1d(params.decoder.channels, 80, 1)
-
-        self.post_net = nn.Sequential(
-            nn.Conv1d(80, params.decoder.channels, 5, padding=2),
-            nn.BatchNorm1d(params.decoder.channels),
-            nn.Tanh(),
-            nn.Dropout(0.5),
-            nn.Conv1d(params.decoder.channels, params.decoder.channels, 5, padding=2),
-            nn.BatchNorm1d(params.decoder.channels),
-            nn.Tanh(),
-            nn.Dropout(0.5),
-            nn.Conv1d(params.decoder.channels, params.decoder.channels, 5, padding=2),
-            nn.BatchNorm1d(params.decoder.channels),
-            nn.Tanh(),
-            nn.Dropout(0.5),
-            nn.Conv1d(params.decoder.channels, params.decoder.channels, 5, padding=2),
-            nn.BatchNorm1d(params.decoder.channels),
-            nn.Tanh(),
-            nn.Dropout(0.5),
-            nn.Conv1d(params.decoder.channels, 80, 5, padding=2)
-        )
+        self.post_net = PostNet(params.decoder.channels)
 
     def forward(
         self,
@@ -77,8 +57,7 @@ class ConformerVC(nn.Module):
         x = self.out_conv(x)
         x *= y_mask
 
-        x_post = x + self.post_net(x)
-        x_post *= y_mask
+        x_post = x + self.post_net(x, y_mask)
 
         return x, x_post, (dur_pred, pitch_pred, energy_pred)
 
@@ -100,6 +79,6 @@ class ConformerVC(nn.Module):
         x = self.out_conv(x)
         x *= y_mask
 
-        x = x + self.post_net(x)
+        x = x + self.post_net(x, y_mask)
         x *= y_mask
         return x

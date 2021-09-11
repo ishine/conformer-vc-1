@@ -28,6 +28,31 @@ class ConvolutionModule(nn.Module):
         return x
 
 
+class PostNet(nn.Module):
+    def __init__(self, channels):
+        super(PostNet, self).__init__()
+
+        self.layers = nn.ModuleList([
+            nn.Sequential(
+                nn.Conv1d(
+                    in_channels=80 if i == 0 else channels,
+                    out_channels=channels,
+                    kernel_size=5,
+                    padding=2,
+                ),
+                nn.BatchNorm1d(channels),
+                nn.Tanh()
+            ) for i in range(4)
+        ])
+        self.layers.append(nn.Conv1d(channels, 80, 1))
+
+    def forward(self, x, x_mask):
+        for layer in self.layers:
+            x = layer(x)
+            x *= x_mask
+        return x
+
+
 class FFN(nn.Module):
     def __init__(self, channels, dropout):
         super(FFN, self).__init__()
@@ -87,7 +112,7 @@ class RelPositionalEncoding(nn.Module):
 
     def extend_pe(self, x):
         if self.pe is not None:
-            if self.pe.size(1) >= x.size(1) * 2 - 1:
+            if self.pe.size(2) >= x.size(2) * 2 - 1:
                 if self.pe.dtype != x.dtype or self.pe.device != x.device:
                     self.pe = self.pe.to(dtype=x.dtype, device=x.device)
                 return
