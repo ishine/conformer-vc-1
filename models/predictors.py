@@ -96,8 +96,10 @@ class VariancePredictor(nn.Module):
 
     def forward(self, x, x_mask):
         for layer in self.layers:
-            x = layer(x) * x_mask
-        x = self.out(x) * x_mask
+            x = layer(x)
+            x *= x_mask
+        x = self.out(x)
+        x *= x_mask
         return x
 
 
