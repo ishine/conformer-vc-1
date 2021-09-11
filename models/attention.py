@@ -53,7 +53,8 @@ class RelativeMultiHeadAttention(nn.Module):
         key = self.key_proj(key).view(B, self.num_heads, self.inner_channels, -1)
         value = self.value_proj(value).view(B, self.num_heads, self.inner_channels, -1)
 
-        pos_emb = self.pos_proj(pos_embedding).view(B, self.num_heads, self.inner_channels, -1)
+        B_pos = pos_embedding.size(0)
+        pos_emb = self.pos_proj(pos_embedding).view(B_pos, self.num_heads, self.inner_channels, -1)
 
         content_score = torch.matmul((query + self.u_bias[None, :, :, None]).transpose(-1, -2), key)
         pos_score = torch.matmul((query + self.v_bias[None, :, :, None]).transpose(-1, -2), pos_emb)
