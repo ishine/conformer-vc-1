@@ -61,7 +61,7 @@ class RelativeMultiHeadAttention(nn.Module):
         score = (content_score + pos_score) / self.sqrt_dim
 
         if mask is not None:
-            score = score.masked_fill(mask == 0, -1e8)
+            score = score.masked_fill(mask == 0, -1e4)
 
         attn_map = F.softmax(score, -1)
         attn = self.dropout(attn_map)
