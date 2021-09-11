@@ -17,12 +17,14 @@ model:
     channels: 384
     n_heads: 2
     n_layers: 4
+    kernel_size: 7
     dropout: 0.1
 
   decoder:
     channels: 384
     n_heads: 2
     n_layers: 4
+    kernel_size: 7
     dropout: 0.1
 
 optimizer:

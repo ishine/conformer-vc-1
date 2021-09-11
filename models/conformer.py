@@ -36,6 +36,7 @@ class Conformer(nn.Module):
                  channels=384,
                  n_layers=4,
                  n_heads=2,
+                 kernel_size=7,
                  dropout=0.1):
         super(Conformer, self).__init__()
 
@@ -43,6 +44,7 @@ class Conformer(nn.Module):
             ConformerLayer(
                 channels=channels,
                 n_heads=n_heads,
+                kernel_size=kernel_size,
                 dropout=dropout
             ) for _ in range(n_layers)
         ])
