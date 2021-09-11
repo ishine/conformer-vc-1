@@ -123,11 +123,13 @@ class Trainer:
         x, x_post, (dur_pred, pitch_pred, energy_pred) = model(
             src_mel, src_length, tgt_length, src_pitch, tgt_pitch, src_energy, tgt_energy, path
         )
+        print(x.dtype, dur_pred.dtype)
         loss_recon = F.l1_loss(x, tgt_mel)
         loss_post_recon = F.l1_loss(x_post, tgt_mel)
         loss_duration = F.mse_loss(dur_pred, tgt_duration.to(x.dtype))
         loss_pitch = F.mse_loss(pitch_pred, tgt_pitch.to(x.dtype))
         loss_energy = F.mse_loss(energy_pred, tgt_energy.to(x.dtype))
+        print(loss_recon.dtype, loss_duration.dtype)
         loss = loss_recon + loss_post_recon + loss_duration + loss_pitch + loss_energy
         tracker.update(
             loss=loss.item(),
