@@ -60,7 +60,6 @@ class ConformerVC(nn.Module):
 
         x = self.in_conv(x) * x_mask
         x, pos_emb = self.relive_pos_emb(x)
-        print(x.size(), pos_emb.size())
         x = self.encoder(x, pos_emb, x_mask)
 
         x, (dur_pred, pitch_pred, energy_pred) = self.variance_adopter(

@@ -47,8 +47,6 @@ class RelativeMultiHeadAttention(nn.Module):
     def forward(self, query, key, value, pos_embedding, mask=None):
         B = value.size(0)
 
-        print(query.size(), key.size(), value.size(), pos_embedding.size())
-
         query = self.query_proj(query).view(B, self.num_heads, self.inner_channels, -1)
         key = self.key_proj(key).view(B, self.num_heads, self.inner_channels, -1)
         value = self.value_proj(value).view(B, self.num_heads, self.inner_channels, -1)
