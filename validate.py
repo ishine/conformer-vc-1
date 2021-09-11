@@ -72,6 +72,7 @@ def main():
         plt.ylabel('JSUT')
         plt.imshow(attn.T, aspect='auto', origin='lower')
         plt.savefig(path)
+        plt.close()
 
     fns = list(sorted(list(Path(args.data_dir).glob('*.pt'))))
 
