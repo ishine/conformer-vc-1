@@ -89,7 +89,7 @@ class Trainer:
             accelerator.backward(loss)
             accelerator.clip_grad_norm_(model.parameters(), 5)
             optimizer.step()
-            bar.update(1)
+            bar.update()
             bar.set_postfix_str(f'Loss: {loss:.6f}')
         bar.set_postfix_str(f'Mean Loss: {tracker.loss.mean():.6f}')
         self.write_losses(epoch, writer, tracker, mode='train')
