@@ -85,9 +85,9 @@ class VariancePredictor(nn.Module):
 
         self.layers = nn.ModuleList([
             nn.Sequential(
-                nn.Conv1d(channels, channels, kernel_size, padding=kernel_size // 2),
-                nn.ReLU(),
                 LayerNorm(channels),
+                nn.Conv1d(channels, channels, kernel_size, padding=kernel_size // 2),
+                nn.SiLU(),
                 nn.Dropout(dropout)
             ) for _ in range(n_layers)
         ])
@@ -96,9 +96,8 @@ class VariancePredictor(nn.Module):
 
     def forward(self, x, x_mask):
         for layer in self.layers:
-            x = layer(x)
-        x = self.out(x)
-        x *= x_mask
+            x = layer(x) * x_mask
+        x = self.out(x) * x_mask
         return x
 
 
