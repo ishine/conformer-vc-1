@@ -64,7 +64,7 @@ class Trainer:
         model, optimizer, train_loader, valid_loader = accelerator.prepare(
             model, optimizer, train_loader, valid_loader
         )
-        scheduler = NoamLR(optimizer, d_model=config.model.encoder.channels, last_epoch=epochs-1)
+        scheduler = NoamLR(optimizer, d_model=config.model.encoder.channels, last_epoch=epochs * len(train_loader) - 1)
 
         for epoch in range(epochs, config.train.num_epochs):
             self.train_step(epoch, model, optimizer, scheduler, train_loader, writer, accelerator)
