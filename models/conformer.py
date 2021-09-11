@@ -9,7 +9,7 @@ class ConformerLayer(nn.Module):
                  channels,
                  n_heads,
                  dropout,
-                 kernel_size=7):
+                 kernel_size):
         super(ConformerLayer, self).__init__()
 
         self.ff1 = FFN(channels, dropout)
