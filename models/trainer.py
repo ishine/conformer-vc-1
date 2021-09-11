@@ -34,6 +34,8 @@ class Trainer:
 
         if accelerator.is_main_process:
             writer = SummaryWriter(log_dir=f'{str(output_dir)}/logs')
+        else:
+            writer = None
 
         train_data, valid_data = self.prepare_data(config.data)
         train_dataset = VCDataset(train_data)
