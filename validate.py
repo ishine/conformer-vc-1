@@ -31,7 +31,7 @@ def main():
     checkpoint = torch.load(f'{args.model_dir}/latest.ckpt', map_location=device)
     model = ConformerVC(config.model)
     model.load_state_dict(checkpoint['model'])
-    print(f'Loaded Model Iteration {checkpoint["iteration"]} step')
+    print(f'Loaded {checkpoint["iteration"]} Iteration Model')
     hifi_gan = load_hifi_gan(args.hifi_gan)
     model, hifi_gan = model.eval().to(device), hifi_gan.eval().to(device)
 
