@@ -1,4 +1,5 @@
-jmvd_dir: ../../dataset/vc/jmvd/basic5000
-jsut_dir: ../../dataset/jsut/wav
-label_dir: ../../dataset/jsut/labels
-output_dir: ./dataset/feats
+src_dir: ../../dataset/vc/jmvd/basic5000
+tgt_dir: ../../dataset/jsut/wav
+orig_sr: 48000
+new_sr: 24000
+output_dir: ./dataset/test

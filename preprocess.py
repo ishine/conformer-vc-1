@@ -5,69 +5,48 @@ import librosa
 import soundfile as sf
 import pyworld as pw
 import torch
+from tqdm import tqdm
+from argparse import ArgumentParser
 from omegaconf import OmegaConf
 from resemblyzer import trim_long_silences
-from tqdm import tqdm
 
 from transform import TacotronSTFT
 from dtw import dtw
 
-ORIG_SR = 48000
-NEW_SR = 24000
+ORIG_SR = None
+NEW_SR = None
 
 
 class PreProcessor:
 
     def __init__(self, config):
-        self.jmvd_dir = Path(config.jmvd_dir)
-        self.jsut_dir = Path(config.jsut_dir)
-
-        self.label_dir = Path(config.label_dir)
+        self.src_dir = Path(config.src_dir)
+        self.tgt_dir = Path(config.tgt_dir)
 
         self.output_dir = Path(config.output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         self.to_mel = TacotronSTFT()
 
-    def load_jmvd(self, wav_path):
+        global ORIG_SR, NEW_SR
+        ORIG_SR = config.orig_sr
+        NEW_SR = config.new_sr
+
+    @staticmethod
+    def load_wav(wav_path):
         wav, sr = sf.read(wav_path)
         wav = librosa.resample(wav, ORIG_SR, NEW_SR)
         wav_trimmed = trim_long_silences(wav)
         return wav_trimmed
 
     @staticmethod
-    def get_time(path, sr=24000):
-        with open(path, 'r', encoding='utf-8') as f:
-            lines = f.readlines()
-        b, e = lines[1], lines[-2]
-        begin_time = int(float(b.split(' ')[0]) * 1e-7 * sr)
-        end_time = int(float(e.split(' ')[1]) * 1e-7 * sr)
-        return begin_time, end_time
-
-    def load_jsut(self, wav_path, label_path):
-        wav, sr = sf.read(wav_path)
-        wav = librosa.resample(wav, ORIG_SR, NEW_SR)
-        b, e = self.get_time(label_path, sr=NEW_SR)
-        wav_trimmed = wav[b:e]
-        return wav_trimmed
-
-    def extract_feats(self, wav):
+    def extract_feats(wav):
         f0, sp, ap = pw.wav2world(wav, NEW_SR, 1024, 256 / NEW_SR * 1000)
         mfcc = pw.code_spectral_envelope(sp, NEW_SR, 24)
         return f0, sp, ap, mfcc
 
-    def normalize(self, feats, scaler):
-        mean = scaler.mean_[0]
-        std = scaler.scale_[0]
-        for i in range(len(feats)):
-            feat = feats[i]
-            non_zero_idx = feat != 0
-            feat[non_zero_idx] = (feat[non_zero_idx] - mean) / std
-            feats[i] = feat
-        return feats
-
-    def process_jmvd(self):
-        jmvd_paths = list(sorted(list(self.jmvd_dir.glob('*.wav'))))
+    def process_speaker(self, dir_path):
+        wav_paths = list(sorted(list(dir_path.glob('*.wav'))))
 
         wavs = list()
         mels = list()
@@ -76,10 +55,10 @@ class PreProcessor:
         energies = list()
         mfccs = list()
 
-        for i in tqdm(range(len(jmvd_paths))):
-            jmvd_wav = self.load_jmvd(jmvd_paths[i])
-            pitch, *_, mfcc = self.extract_feats(jmvd_wav)
-            mel, energy = self.to_mel(torch.FloatTensor(jmvd_wav)[None, :])
+        for i in tqdm(range(len(wav_paths))):
+            wav = self.load_wav(wav_paths[i])
+            pitch, *_, mfcc = self.extract_feats(wav)
+            mel, energy = self.to_mel(torch.FloatTensor(wav)[None, :])
 
             pitch = np.array(pitch).astype(np.float32)
             energy = np.array(energy).astype(np.float32)
@@ -89,41 +68,7 @@ class PreProcessor:
 
             assert pitch.shape[0] == mel.size(-1)
 
-            wavs.append(jmvd_wav)
-            mels.append(mel)
-            lengths.append(mel.size(-1))
-            pitches.append(pitch)
-            energies.append(energy)
-            mfccs.append(mfcc)
-
-        return wavs, mels, pitches, energies, mfccs, lengths
-
-    def process_jsut(self):
-        jsut_paths = list(sorted(list(self.jsut_dir.glob('*.wav'))))[:550]
-        label_paths = list(sorted(list(self.label_dir.glob('*.lab'))))[:len(jsut_paths)]
-
-
-        wavs = list()
-        mels = list()
-        lengths = list()
-        pitches = list()
-        energies = list()
-        mfccs = list()
-
-        for i in tqdm(range(len(jsut_paths))):
-            jsut_wav = self.load_jsut(jsut_paths[i], label_paths[i])
-            pitch, *_, mfcc = self.extract_feats(jsut_wav)
-            mel, energy = self.to_mel(torch.FloatTensor(jsut_wav)[None, :])
-
-            pitch = np.array(pitch).astype(np.float32)
-            energy = np.array(energy).astype(np.float32)
-
-            pitch[pitch != 0] = np.log(pitch[pitch != 0])
-            energy[energy != 0] = np.log(energy[energy != 0])
-
-            assert pitch.shape[0] == mel.size(-1)
-
-            wavs.append(jsut_wav)
+            wavs.append(wav)
             mels.append(mel)
             lengths.append(mel.size(-1))
             pitches.append(pitch)
@@ -133,12 +78,12 @@ class PreProcessor:
         return wavs, mels, pitches, energies, mfccs, lengths
 
     def preprocess(self):
-        print('Start JMVD')
-        src_wavs, src_mels, src_pitches, src_energies, src_mfccs, src_lengths = self.process_jmvd()
-        print('Start JSUT')
-        tgt_wavs, tgt_mels, tgt_pitches, tgt_energies, tgt_mfccs, tgt_lengths = self.process_jsut()
+        print('Start Source')
+        src_wavs, src_mels, src_pitches, src_energies, src_mfccs, src_lengths = self.process_speaker(self.src_dir)
+        print('Start Target')
+        tgt_wavs, tgt_mels, tgt_pitches, tgt_energies, tgt_mfccs, tgt_lengths = self.process_speaker(self.tgt_dir)
 
-        assert len(src_mfccs) == len(tgt_mfccs)
+        assert len(src_mfccs) == len(tgt_mfccs), 'Dataset must be parallel data.'
         print('Calculate DTW')
         paths = [dtw(src_mfccs[i], tgt_mfccs[i], interp=False) for i in tqdm(range(len(src_mfccs)))]
 
@@ -160,5 +105,8 @@ class PreProcessor:
 
 
 if __name__ == '__main__':
-    config = OmegaConf.load('configs/preprocess.yaml')
+    parser = ArgumentParser()
+    parser.add_argument('-c', '--config', type=str, default='configs/preprocess.yaml')
+    args = parser.parse_args()
+    config = OmegaConf.load(args.config)
     PreProcessor(config).preprocess()
