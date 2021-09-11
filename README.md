@@ -8,6 +8,22 @@ The differences between original paper are
 - Mel-spectrograms are not normalized by speaker statistics.
 - Use HiFi-GAN instead of PrallelWaveGAN
 
+# Requirements
+
+- pytorch
+- numpy
+- pyworld
+- accelerate
+- soundfile
+- librosa
+- cython
+- omegaconf
+- tqdm
+- resemblyzer
+- matplotlib
+- scipy
+
+If you get an error about the package, please install it.
 
 # Usage
 
@@ -24,9 +40,20 @@ $ python prerprocess.py
 
 2. Training
 
+single gpu training
+
 ```bash
 $ ln -s ./dataaset/feats DATA
 $ python train.py
+```
+or multi gpus
+
+```bash
+$ accelerate config
+
+answer question of your machine.
+
+$ accelerate launch train.py
 ```
 
 3. Validation
