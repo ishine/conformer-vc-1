@@ -23,6 +23,8 @@ class Trainer:
     def run(self):
         config = OmegaConf.load(self.config_path)
 
+        accelerator = Accelerator(fp16=config.train.fp16)
+
         seed_everything(config.seed)
 
         output_dir = Path(config.model_dir)
@@ -30,10 +32,8 @@ class Trainer:
 
         OmegaConf.save(config, output_dir / 'config.yaml')
 
-        writer = SummaryWriter(log_dir=f'{str(output_dir)}/logs')
-
-        seed_everything(config.seed)
-        accelerator = Accelerator(fp16=config.train.fp16)
+        if accelerator.is_main_process:
+            writer = SummaryWriter(log_dir=f'{str(output_dir)}/logs')
 
         train_data, valid_data = self.prepare_data(config.data)
         train_dataset = VCDataset(train_data)
@@ -93,7 +93,8 @@ class Trainer:
             bar.update()
             bar.set_postfix_str(f'Loss: {loss:.6f}')
         bar.set_postfix_str(f'Mean Loss: {tracker.loss.mean():.6f}')
-        self.write_losses(epoch, writer, tracker, mode='train')
+        if accelerator.is_main_process:
+            self.write_losses(epoch, writer, tracker, mode='train')
         bar.close()
 
     def valid_step(self, epoch, model, loader, writer):
