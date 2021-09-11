@@ -104,6 +104,5 @@ class VariancePredictor(nn.Module):
 
 class LengthRegulator(nn.Module):
     def forward(self, x, path):
-        # b c t, b t d -> b c d
         x = torch.bmm(x, path)
         return x
