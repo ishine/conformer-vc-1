@@ -79,7 +79,8 @@ class Trainer:
                         accelerator.unwrap_model(model),
                         optimizer
                     )
-        writer.close()
+        if accelerator.is_main_process:
+            writer.close()
 
     def train_step(self, epoch, model, optimizer, scheduler, loader, writer, accelerator):
         model.train()
