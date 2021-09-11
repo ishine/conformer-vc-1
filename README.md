@@ -29,10 +29,10 @@ If you get an error about the package, please install it.
 
 1. Preprocess
 
-If you wanna train your dataset, please rewrite configs/preprocess.yaml and preprocess.py properly.
+If you wanna train your dataset, please rewrite configs/preprocess.yaml and preprocess.py properly.  
+Note that num of source files and num of tgt files must be same.
 
 ```bash
-# setup for dtw module
 $ cd dtw && python setup.py build_ext --inplace && cd ..
 $ python prerprocess.py
 ```
