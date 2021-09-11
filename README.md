@@ -30,7 +30,7 @@ If you get an error about the package, please install it.
 1. Preprocess
 
 If you wanna train your dataset, please rewrite configs/preprocess.yaml and preprocess.py properly.  
-Note that num of source files and num of tgt files must be same.
+Note that num of source files and num of tgt files must be same and file ids must be same.
 
 ```bash
 $ cd dtw && python setup.py build_ext --inplace && cd ..
