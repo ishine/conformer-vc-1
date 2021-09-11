@@ -6,7 +6,7 @@ train:
   fp16: true
   batch_size: 32
   num_epochs: 3000
-  save_interval: 1
+  save_interval: 100
   train_ratio: 0.9
 
 data:
