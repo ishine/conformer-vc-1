@@ -23,7 +23,8 @@ class Trainer:
     def run(self):
         config = OmegaConf.load(self.config_path)
 
-        accelerator = Accelerator(fp16=config.train.fp16)
+        # accelerator = Accelerator(fp16=config.train.fp16)
+        accelerator = Accelerator(cpu=True)
 
         seed_everything(config.seed)
 
