@@ -27,7 +27,7 @@ class RelativeMultiHeadAttention(nn.Module):
         super(RelativeMultiHeadAttention, self).__init__()
         assert channels % num_heads == 0, "d_model % num_heads should be zero."
         self.channels = channels
-        self.inner_channels = int(channels / num_heads)
+        self.inner_channels = channels // num_heads
         self.num_heads = num_heads
         self.sqrt_dim = math.sqrt(channels)
 
