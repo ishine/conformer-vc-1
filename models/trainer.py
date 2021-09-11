@@ -33,7 +33,6 @@ class Trainer:
 
         seed_everything(config.seed)
         accelerator = Accelerator(fp16=config.train.fp16)
-        n_gpus = torch.cuda.device_count()
 
         train_data, valid_data = self.prepare_data(config.data)
         train_dataset = VCDataset(train_data)
@@ -41,7 +40,7 @@ class Trainer:
 
         train_loader = DataLoader(
             train_dataset,
-            batch_size=config.train.batch_size * n_gpus,
+            batch_size=config.train.batch_size,
             shuffle=True,
             num_workers=8,
             collate_fn=collate_fn
@@ -49,7 +48,7 @@ class Trainer:
 
         valid_loader = DataLoader(
             valid_dataset,
-            batch_size=config.train.batch_size * n_gpus,
+            batch_size=config.train.batch_size,
             num_workers=8,
             collate_fn=collate_fn
         )
