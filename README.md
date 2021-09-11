@@ -29,8 +29,7 @@ If you get an error about the package, please install it.
 
 1. Preprocess
 
-Note that this project is for my dataset.  
-So, if you wanna train your dataset, please rewrite configs/preprocess.yaml and preprocess.py properly.
+If you wanna train your dataset, please rewrite configs/preprocess.yaml and preprocess.py properly.
 
 ```bash
 # setup for dtw module
@@ -49,6 +48,7 @@ $ python train.py
 or multi gpus
 
 ```bash
+$ ln -s ./dataaset/feats DATA
 $ accelerate config
 
 answer question of your machine.

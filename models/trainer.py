@@ -137,13 +137,13 @@ class Trainer:
         return loss
 
     def prepare_data(self, config):
-
         data_dir = Path(config.data_dir)
         assert data_dir.exists()
 
         fns = list(sorted(list(data_dir.glob('*.pt'))))
-        train = fns[:500]
-        valid = fns[500:]
+        train_size = int(len(fns) * config.train.train_ratio)
+        train = fns[:train_size]
+        valid = fns[train_size:]
         return train, valid
 
     def load(self, config, model, optimizer):
