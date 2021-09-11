@@ -1,5 +1,5 @@
-src_dir: ../../dataset/vc/jmvd/basic5000
-tgt_dir: ../../dataset/jsut/wav
+src_dir: ../../dataset/vc/src_dir
+tgt_dir: ../../dataset/vc/tgt_dir
 orig_sr: 48000
 new_sr: 24000
 output_dir: ./dataset/test
