@@ -1,12 +1,13 @@
 # Conformer-VC
 
-Conformer-VC is inspired by [Non-autoregressive sequence-to-sequence voice conversion](https://arxiv.org/abs/2104.06793) that is parallel voice conversion methods by using conformer.
+Conformer-VC is inspired by [Non-autoregressive sequence-to-sequence voice conversion](https://arxiv.org/abs/2104.06793) that is parallel voice conversion methods powered by conformer.
 
 The differences between original paper are
 
 - NOT using reduction-factor.
 - Mel-spectrograms are not normalized by speaker statistics.
-- Use HiFi-GAN instead of PrallelWaveGAN
+- Extract durations by DTW, not pretrained autoregressive model.
+- Use HiFi-GAN instead of ParallelWaveGAN
 
 # Requirements
 
