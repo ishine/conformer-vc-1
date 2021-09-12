@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader
 from data import VCDataset, collate_fn
 from .model import ConformerVC
 from .lr_scheduler import NoamLR
-from utils import seed_everything, Tracker
+from utils import seed_everything, Tracker, latest_checkpoint
 
 
 class Trainer:
@@ -37,24 +37,7 @@ class Trainer:
         else:
             writer = None
 
-        train_data, valid_data = self.prepare_data(config.data)
-        train_dataset = VCDataset(train_data)
-        valid_dataset = VCDataset(valid_data)
-
-        train_loader = DataLoader(
-            train_dataset,
-            batch_size=config.train.batch_size,
-            shuffle=True,
-            num_workers=8,
-            collate_fn=collate_fn
-        )
-
-        valid_loader = DataLoader(
-            valid_dataset,
-            batch_size=config.train.batch_size,
-            num_workers=8,
-            collate_fn=collate_fn
-        )
+        train_loader, valid_loader = self.prepare_data(config)
 
         model = ConformerVC(config.model)
         optimizer = optim.AdamW(model.parameters(), eps=1e-9, **config.optimizer)
@@ -73,7 +56,7 @@ class Trainer:
                 self.valid_step(epoch, model, valid_loader, writer)
                 if (epoch + 1) % config.train.save_interval == 0:
                     self.save(
-                        output_dir / 'latest.ckpt',
+                        output_dir / f'cfm-vc_{epoch+1}.ckpt',
                         epoch,
                         (epoch+1)*len(train_loader),
                         accelerator.unwrap_model(model),
@@ -141,18 +124,38 @@ class Trainer:
         return loss
 
     def prepare_data(self, config):
-        data_dir = Path(config.data_dir)
+        data_dir = Path(config.data.data_dir)
         assert data_dir.exists()
 
         fns = list(sorted(list(data_dir.glob('*.pt'))))
         train_size = int(len(fns) * config.train.train_ratio)
-        train = fns[:train_size]
-        valid = fns[train_size:]
-        return train, valid
+        train_data = fns[:train_size]
+        valid_data = fns[train_size:]
+
+        train_dataset = VCDataset(train_data)
+        valid_dataset = VCDataset(valid_data)
+
+        train_loader = DataLoader(
+            train_dataset,
+            batch_size=config.train.batch_size,
+            shuffle=True,
+            num_workers=8,
+            collate_fn=collate_fn
+        )
+
+        valid_loader = DataLoader(
+            valid_dataset,
+            batch_size=config.train.batch_size,
+            num_workers=8,
+            collate_fn=collate_fn
+        )
+
+        return train_loader, valid_loader
 
     def load(self, config, model, optimizer):
         if config.resume_checkpoint:
-            checkpoint = torch.load(f'{config.model_dir}/latest.ckpt')
+            ckpt_path = latest_checkpoint(config.model_dir)
+            checkpoint = torch.load(ckpt_path)
             epochs = checkpoint['epoch']
             iteration = checkpoint['iteration']
             model.load_state_dict(checkpoint['model'])

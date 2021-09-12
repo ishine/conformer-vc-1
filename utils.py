@@ -1,5 +1,7 @@
 import os
+import re
 import random
+import pathlib
 import numpy as np
 import torch
 from collections import defaultdict
@@ -11,6 +13,14 @@ def seed_everything(seed=42):
     np.random.seed(seed)
     torch.manual_seed(seed)
     torch.backends.cudnn.deterministic = True
+
+
+def latest_checkpoint(model_dir):
+    d = pathlib.Path(model_dir)
+    assert d.exists(), 'directory is not exists.'
+    checkpoints = list(d.glob('*.ckpt'))
+    latest_ckpt = sorted(checkpoints, key=lambda x: re.sub(r'\D', '', x.name))
+    return latest_ckpt[-1]
 
 
 class AverageMeter:
