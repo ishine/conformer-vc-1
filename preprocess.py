@@ -19,7 +19,8 @@ NEW_SR = None
 
 class PreProcessor:
 
-    def __init__(self, config):
+    def __init__(self, config_path):
+        config = OmegaConf.load(config_path)
         self.src_dir = Path(config.src_dir)
         self.tgt_dir = Path(config.tgt_dir)
 
@@ -108,5 +109,4 @@ if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('-c', '--config', type=str, default='configs/preprocess.yaml')
     args = parser.parse_args()
-    config = OmegaConf.load(args.config)
-    PreProcessor(config).preprocess()
+    PreProcessor(args.config).preprocess()
