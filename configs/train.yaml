@@ -1,5 +1,5 @@
 seed: 42
-model_dir: ../../models/cfm_vc
+model_dir: ./checkpoints
 resume_checkpoint: false
 
 train:
