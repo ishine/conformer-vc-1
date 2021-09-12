@@ -19,8 +19,8 @@ def latest_checkpoint(model_dir):
     d = pathlib.Path(model_dir)
     assert d.exists(), 'directory is not exists.'
     checkpoints = list(d.glob('*.ckpt'))
-    latest_ckpt = sorted(checkpoints, key=lambda x: re.sub(r'\D', '', x.name))
-    return latest_ckpt[-1]
+    latest_ckpt = list(sorted(checkpoints, key=lambda x: re.sub(r'\D', '', x.name)))[-1]
+    return latest_ckpt
 
 
 class AverageMeter:
