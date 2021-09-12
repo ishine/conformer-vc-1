@@ -5,9 +5,9 @@ from .attention import LayerNorm
 from .utils import sequence_mask, generate_path
 
 
-class VarianceAdopter(nn.Module):
+class VarianceConverter(nn.Module):
     def __init__(self, channels, dropout):
-        super(VarianceAdopter, self).__init__()
+        super(VarianceConverter, self).__init__()
         self.duration_predictor = VariancePredictor(
             channels=channels,
             n_layers=2,

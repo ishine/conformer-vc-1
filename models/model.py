@@ -2,7 +2,7 @@ import torch.nn as nn
 
 from .common import RelPositionalEncoding, PostNet
 from .conformer import Conformer
-from .predictors import VarianceAdopter
+from .predictors import VarianceConverter
 from .utils import sequence_mask
 
 
@@ -16,7 +16,7 @@ class ConformerVC(nn.Module):
             params.encoder.dropout
         )
         self.encoder = Conformer(**params.encoder)
-        self.variance_adopter = VarianceAdopter(
+        self.variance_adopter = VarianceConverter(
             channels=params.encoder.channels,
             dropout=params.encoder.dropout
         )
